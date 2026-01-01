@@ -20,7 +20,16 @@ async def _put_image() -> Attachment:
     #  3. Use BytesIO to load bytes of image
     #  4. Upload file with client
     #  5. Return Attachment object with title (file name), url and type (mime type)
-    raise NotImplementedError
+
+    dial_bucket_client = DialBucketClient(API_KEY, DIAL_URL)
+
+    with open(image_path, "b") as image_file:
+        image_bytes = image_file.read()
+
+    image_content = BytesIO(image_bytes)
+    attachment = await dial_bucket_client.put_file(file_name, mime_type_png, image_content)
+
+    return Attachment(title=file_name, url=attachment["url"], type=mime_type_png)
 
 
 def start() -> None:
