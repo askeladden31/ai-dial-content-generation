@@ -34,7 +34,7 @@ def start() -> None:
             ImgContent(ImgUrl("https://a-z-animals.com/media/2019/11/Elephant-male-1024x535.jpg"))
         ])
     ])
-    print(completion)
+    print(completion.content)
 
 
 start()

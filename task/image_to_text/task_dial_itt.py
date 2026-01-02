@@ -21,15 +21,14 @@ async def _put_image() -> Attachment:
     #  4. Upload file with client
     #  5. Return Attachment object with title (file name), url and type (mime type)
 
-    dial_bucket_client = DialBucketClient(API_KEY, DIAL_URL)
+    async with DialBucketClient(API_KEY, DIAL_URL) as dial_bucket_client:
+        with open(image_path, "rb") as image_file:
+            image_bytes = image_file.read()
 
-    with open(image_path, "b") as image_file:
-        image_bytes = image_file.read()
+        image_content = BytesIO(image_bytes)
+        response = await dial_bucket_client.put_file(file_name, mime_type_png, image_content)
 
-    image_content = BytesIO(image_bytes)
-    response = await dial_bucket_client.put_file(file_name, mime_type_png, image_content)
-
-    return Attachment(title=file_name, url=response["url"], type=mime_type_png)
+        return Attachment(title=file_name, url=response["url"], type=mime_type_png)
 
 
 def start() -> None:

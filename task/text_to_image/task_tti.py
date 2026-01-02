@@ -41,13 +41,15 @@ async def _save_images(attachments: list[Attachment]):
     #  2. Iterate through Images from attachments, download them and then save here
     #  3. Print confirmation that image has been saved locally
 
-    dial_bucket_client = DialBucketClient(API_KEY, DIAL_URL)
-    for a in attachments:
-        filename = f"{a.title}.png"
-        content = await dial_bucket_client.get_file(a.url)
-        with open(filename, "w") as f:
-            f.write(content)
-        print(f"{filename} saved locally.")
+    async with DialBucketClient(API_KEY, DIAL_URL) as dial_bucket_client:
+        for a in attachments:
+            if not (url := a.url):
+                continue
+            content = await dial_bucket_client.get_file(url)
+            filename = f"{a.title}.png"
+            with open(filename, "wb") as f:
+                f.write(content)
+            print(f"{filename} saved locally.")
 
 
 def start() -> None:
@@ -59,19 +61,20 @@ def start() -> None:
     #    - Documentation: See `custom_fields`. https://dialx.ai/dial_api#operation/sendChatCompletionRequest
     #  5. Test it with the 'imagegeneration@005' (Google image generation model)
 
+    # deployment_name = 'dall-e-3'
     deployment_name = 'imagegeneration@005'
     dial_model_client = DialModelClient(DIAL_CHAT_COMPLETIONS_ENDPOINT, deployment_name, API_KEY)
     completion = dial_model_client.get_completion([
             Message(Role.USER, "Generate image for Sunny day on Bali")
         ],
-        custom_fields={
-            "configuration":
-                {
-                    "size": Size.square,
-                    "style": Style.natural,
-                    "quality": Quality.standard
-                }
-        }
+        # custom_fields={
+        #     "configuration":
+        #         {
+        #             "size": Size.square,
+        #             "style": Style.natural,
+        #             "quality": Quality.standard
+        #         }
+        # }
     )
     print(completion)
     attachments = []
