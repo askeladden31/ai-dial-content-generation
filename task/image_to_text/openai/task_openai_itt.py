@@ -31,7 +31,8 @@ def start() -> None:
     completion = dial_model_client.get_completion([
         ContentedMessage(role=Role.USER, content=[
             TxtContent(text="What is in this image?"),
-            ImgContent(ImgUrl("https://a-z-animals.com/media/2019/11/Elephant-male-1024x535.jpg"))
+            ImgContent(ImgUrl("https://a-z-animals.com/media/2019/11/Elephant-male-1024x535.jpg")),
+            ImgContent(ImgUrl(f"data:image/png;base64,{base64_image}")),
         ])
     ])
     print(completion.content)
